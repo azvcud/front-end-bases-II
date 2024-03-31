@@ -1,41 +1,61 @@
 'use client';
 import * as React from "react";
+import { useRouter } from 'next/navigation';
+import {useCart, Product} from "../../utils/CartContext"
 
-interface Product {
-  name: string;
-  price: string;
-  pricePerUnit: string;
-  image: string;
-  quantityImage: string;
-}
 
 interface CartItemProps {
   product: Product;
   onRemove: () => void;
+  onIncrease: () => void;
+  onDecrease: () => void;
 }
 
-const CartItem: React.FC<CartItemProps> = ({ product, onRemove }) => {
+const CartItem: React.FC<CartItemProps> = ({ product, onRemove, onIncrease, onDecrease }) => {
   return (
-    <div className="flex gap-5 justify-between pr-6 w-full rounded-3xl border-2 border-solid bg-stone-50 border-neutral-200 max-md:flex-wrap max-md:pr-5 max-md:max-w-full">
+    <div className="flex mb-4 gap-5 justify-between pr-6 w-full rounded-3xl border-2 border-solid bg-stone-50 border-neutral-200 max-md:flex-wrap max-md:pr-5 max-md:max-w-full">
       <div className="flex gap-5 justify-between text-xl font-semibold leading-7">
         <img
           src={product.image}
           alt={product.name}
-          className="shrink-0 w-40 max-w-full aspect-[1.01]"
+          className="shrink-0 rounded-xl w-40 max-w-full aspect-[1.01]"
         />
         <div className="flex flex-col my-auto">
           <div className="text-black">{product.name}</div>
-          <div className="mt-3.5 text-lime-800">{product.pricePerUnit}</div>
-          <img
-            src={product.quantityImage}
-            alt=""
-            className="mt-5 w-32 max-w-full rounded-3xl border-2 border-solid aspect-[3.23] border-black border-opacity-10"
-          />
+          <div className="mt-3.5 mb-3 text-lime-800">$ {product.price}</div>
+
+          {/* Botones aumentar, disminuir cantidad */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={onDecrease}
+                className="group rounded-[50px] border border-gray-200 shadow-sm shadow-transparent p-2.5 flex items-center justify-center bg-white transition-all duration-500 hover:shadow-gray-200 hover:bg-gray-50 hover:border-gray-300 focus-within:outline-gray-300">
+                <svg className="stroke-gray-900 transition-all duration-500 group-hover:stroke-black"
+                    width="18" height="19" viewBox="0 0 18 19" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4.5 9.5H13.5" stroke="" strokeWidth="1.6" strokeLinecap="round"
+                        strokeLinejoin="round" />
+                </svg>
+            </button>
+            <input type="text" id="number"
+                className="border border-gray-200 rounded-full w-10 aspect-square outline-none text-gray-900 font-semibold text-sm py-1.5 px-3 bg-gray-100  text-center"
+                value={product.quantity} onChange={()=>{}}/>
+            <button
+              onClick={onIncrease}
+                className="group rounded-[50px] border border-gray-200 shadow-sm shadow-transparent p-2.5 flex items-center justify-center bg-white transition-all duration-500 hover:shadow-gray-200 hover:bg-gray-50 hover:border-gray-300 focus-within:outline-gray-300">
+                <svg className="stroke-gray-900 transition-all duration-500 group-hover:stroke-black"
+                    width="18" height="19" viewBox="0 0 18 19" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.75 9.5H14.25M9 14.75V4.25" stroke="" strokeWidth="1.6"
+                        strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            </button>
+          </div>
+
         </div>
       </div>
       <div className="flex flex-col my-auto whitespace-nowrap">
         <div className="self-end text-xl font-semibold leading-7 text-right text-black">
-          {product.price}
+          $ {product.price * product.quantity}
         </div>
         <button
           type="button"
@@ -49,41 +69,17 @@ const CartItem: React.FC<CartItemProps> = ({ product, onRemove }) => {
   );
 };
 
-const products: Product[] = [
-  {
-    name: "Heirloom tomato",
-    price: "$5.99",
-    pricePerUnit: "$5.99 / lb",
-    image: "https://cdn.builder.io/api/v1/image/assets/TEMP/6de0f245530c9da35e1266add0d6bba333dc843eb18860f2a762de82545d28ac?apiKey=f50096866ace49c1858e31fb063ed080&",
-    quantityImage: "https://cdn.builder.io/api/v1/image/assets/TEMP/7c946acc72f00bda4323801e19999fec0af463f691f2104adb4f84c99fb6d44a?apiKey=f50096866ace49c1858e31fb063ed080&",
-  },
-  {
-    name: "Organic ginger",
-    price: "$6.50",
-    pricePerUnit: "$12.99 / lb",
-    image: "https://cdn.builder.io/api/v1/image/assets/TEMP/6505f578d9d4e6e95e17ca74fb94c315e0d8a4725b2191e3ee92f2ce5a078254?apiKey=f50096866ace49c1858e31fb063ed080&",
-    quantityImage: "https://cdn.builder.io/api/v1/image/assets/TEMP/25c704cd9bfec1df537297de8d433ca51ff0ec6da59b66559452f9f745f6d8d6?apiKey=f50096866ace49c1858e31fb063ed080&",
-  },
-  {
-    name: "Sweet onion",
-    price: "$14.95",
-    pricePerUnit: "$2.99 / lb",
-    image: "https://cdn.builder.io/api/v1/image/assets/TEMP/3d987c74946a20120e1c0cc7a63808c259db6aa7e567d5978a3f81deea7b145c?apiKey=f50096866ace49c1858e31fb063ed080&",
-    quantityImage: "https://cdn.builder.io/api/v1/image/assets/TEMP/8a895c39d18bf62983f771e3ca2c84d96fcd04a87e2d6c034d0a647c606f4ede?apiKey=f50096866ace49c1858e31fb063ed080&",
-  },
-];
 
 const MyComponent: React.FC = () => {
-  const [cartItems, setCartItems] = React.useState<Product[]>(products);
+  const { cart, removeFromCart, increaseQuantity, decreaseQuantity } = useCart();
+  const router = useRouter();
 
   const handleRemoveItem = (productToRemove: Product) => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => item.name !== productToRemove.name)
-    );
+    removeFromCart(productToRemove.id)
   };
 
   const handleShopClick = () => {
-    // Logic to navigate to the shop
+    router.push('/natame/tienda')
   };
 
   const handlePaymentClick = () => {
@@ -98,7 +94,7 @@ const MyComponent: React.FC = () => {
     <div className="flex flex-col items-center pt-8 pb-20 bg-white">
       <header className="flex gap-5 w-full max-w-[1301px] max-md:flex-wrap max-md:max-w-full">
         <div className="flex-auto my-auto text-3xl font-medium tracking-tight leading-8 text-lime-800">
-          NatamE
+          NatAmE
         </div>
         <div className="flex gap-5 justify-between text-base leading-5 text-center">
           <button
@@ -109,7 +105,7 @@ const MyComponent: React.FC = () => {
             Tienda
           </button>
           <div className="justify-center self-start px-6 py-4 font-semibold text-white bg-lime-800 rounded max-md:px-5">
-            Carrito ({cartItems.length})
+            Carrito ({cart.length})
           </div>
           <img
             src="https://cdn.builder.io/api/v1/image/assets/TEMP/91b68bb1ba5dba82c30e8f3cc1143215fdd2239e3518ad96b9e9f9cb9e7c5f6c?apiKey=f50096866ace49c1858e31fb063ed080&"
@@ -127,7 +123,7 @@ const MyComponent: React.FC = () => {
           </div>
           <div className="flex flex-col ml-5 w-[85%] max-md:ml-0 max-md:w-full">
             <div className="mt-7 text-xl font-light leading-7 text-black max-md:mt-10 max-md:max-w-full">
-              {cartItems.length} items
+              {cart.length} items
             </div>
           </div>
         </div>
@@ -136,11 +132,13 @@ const MyComponent: React.FC = () => {
         <div className="flex gap-5 max-md:flex-col max-md:gap-0">
           <div className="flex flex-col w-[68%] max-md:ml-0 max-md:w-full">
             <div className="flex flex-col grow max-md:mt-8 max-md:max-w-full">
-              {cartItems.map((product) => (
+              {cart.map((product) => (
                 <CartItem
                   key={product.name}
                   product={product}
                   onRemove={() => handleRemoveItem(product)}
+                  onIncrease={() => increaseQuantity(product.id)}
+                  onDecrease={() => decreaseQuantity(product.id)}
                 />
               ))}
             </div>

@@ -1,11 +1,22 @@
 'use client';
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import axios, {AxiosResponse} from 'axios';
 import {useCart, Product} from "../../utils/CartContext"
+
+const BACKEND_API_URL = "http://localhost:8080"
 
 interface ProductCardProps {
   product: Product;
   onAddToCart: () => void;
+}
+
+interface APIProduct {
+  nombre: string;
+  codigo: number;
+  subCategoria: number;
+  categoria: number;
+  precioUnitario: number;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -35,30 +46,42 @@ const ProductCard: React.FC<ProductCardProps> = ({
   );
 };
 
-const products = [
-  {
-    image: "https://cdn.builder.io/api/v1/image/assets/TEMP/457abcd58d45a0b36d20f55592ac9c44de726b07ccc9157bb9a9ab632ffee1ae?apiKey=f50096866ace49c1858e31fb063ed080&",
-    id: 1,
-    name: "Heirloom tomato",
-    price: 5.99,
-    category: "category",
-    subcategory: "subcategory",
-    quantity: 0,
-  },
-  {
-    image: "https://cdn.builder.io/api/v1/image/assets/TEMP/1f65230af54f1daaacfa8768ba1dbc2b4f61ec5c4fadf41cdcb799c4bcc9b4b7?apiKey=f50096866ace49c1858e31fb063ed080&",
-    id: 2,
-    name: "Organic ginger",
-    price: 12.99,
-    category: "category",
-    subcategory: "subcategory",
-    quantity: 0,
-  },
-];
 
 const MyComponent: React.FC = () => {
   const { cart, addToCart } = useCart();
   const router = useRouter();
+  const [products, setProducts] = React.useState<Product[]>([]);
+
+  React.useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        //TODO: crear contexto para credenciales y obtener user y password de contexto
+        const user = 'natame';
+        const password = 'natame';
+
+        const response: AxiosResponse<APIProduct[]> = await axios.get<APIProduct[]>(`${BACKEND_API_URL}/producto/`, {
+          headers: {
+            user,
+            password,
+          },
+        });
+
+        setProducts(response.data.map((item: APIProduct) => ({
+          id: item.codigo,
+          name: item.nombre,
+          price: item.precioUnitario.toFixed(2),
+          category: item.categoria,
+          subcategory: item.subCategoria,
+          image: '',
+          quantity: 0,
+        })));
+      } catch (error) {
+        console.error('Error al obtener los productos:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const handleCartClick = () => {
     router.push('/natame/carrito')

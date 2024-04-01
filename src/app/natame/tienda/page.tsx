@@ -2,7 +2,10 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import axios, {AxiosResponse} from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {useCart, Product} from "../../utils/CartContext"
+import { Input, PasswordInput } from "../ventas/page";
 
 const BACKEND_API_URL = "http://localhost:8080"
 
@@ -51,18 +54,31 @@ const MyComponent: React.FC = () => {
   const { cart, addToCart } = useCart();
   const router = useRouter();
   const [products, setProducts] = React.useState<Product[]>([]);
+  const [formUser, setFormUser] = React.useState("");
+  const [formPassword, setFormPassword] = React.useState("");
+
+  const handleChangeCredentials = () => {
+    localStorage.setItem("user", formUser)
+    localStorage.setItem("password", formPassword)
+    toast.success('Se cambiaron las credenciales.', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      });
+  }
 
   React.useEffect(() => {
     const fetchProducts = async () => {
       try {
-        //TODO: crear contexto para credenciales y obtener user y password de contexto
-        const user = 'natame';
-        const password = 'natame';
-
         const response: AxiosResponse<APIProduct[]> = await axios.get<APIProduct[]>(`${BACKEND_API_URL}/producto/`, {
           headers: {
-            user,
-            password,
+            user: localStorage.getItem("user"),
+            password: localStorage.getItem("password"),
           },
         });
 
@@ -75,8 +91,18 @@ const MyComponent: React.FC = () => {
           image: '',
           quantity: 0,
         })));
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error al obtener los productos:', error);
+        toast.error(`Error al obtener los productos: ${error.response.data}`, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
       }
     };
 
@@ -106,6 +132,16 @@ const MyComponent: React.FC = () => {
           />
         </nav>
       </header>
+      <div className="flex w-80 ml-20 gap-2">
+          <Input label="Usuario" value={formUser} onChange={(value) => setFormUser(value)} />
+          <PasswordInput label="Contraseña" value={formPassword} onChange={(value) => setFormPassword(value)} />
+          <button
+              onClick={handleChangeCredentials}
+              className="justify-center self-end px-4 py-2 mt-8 font-medium text-white whitespace-nowrap bg-lime-800 rounded-lg"
+            >
+              Cambiar credenciales
+          </button>
+      </div>
       <section className="flex gap-5 justify-between items-start px-20 pt-16 pb-8 mt-8 w-full bg-white max-md:flex-wrap max-md:px-5 max-md:max-w-full">
         <div className="flex gap-5 text-black max-md:flex-wrap">
           <h1 className="flex-auto text-6xl tracking-tighter leading-[76.8px] max-md:text-4xl">
@@ -139,6 +175,7 @@ const MyComponent: React.FC = () => {
           ))}
         </div>
       </main>
+      <ToastContainer />
     </div>
   );
 };

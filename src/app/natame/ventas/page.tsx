@@ -1,5 +1,8 @@
 'use client';
 import * as React from "react";
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface SelectOption {
   label: string;
@@ -18,11 +21,23 @@ interface SelectProps {
   onChange: (value: string) => void;
 }
 
-const Input: React.FC<InputProps> = ({ label, value, onChange }) => (
+export const Input: React.FC<InputProps> = ({ label, value, onChange }) => (
   <div className="flex flex-col mt-8 text-black whitespace-nowrap max-md:max-w-full">
     <label className="font-medium text-ellipsis max-md:max-w-full">{label}</label>
     <input
       type="text"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="justify-center px-4 py-2 mt-2 bg-white rounded-lg border border-solid border-neutral-200 text-ellipsis max-md:max-w-full"
+    />
+  </div>
+);
+
+export const PasswordInput: React.FC<InputProps> = ({ label, value, onChange }) => (
+  <div className="flex flex-col mt-8 text-black whitespace-nowrap max-md:max-w-full">
+    <label className="font-medium text-ellipsis max-md:max-w-full">{label}</label>
+    <input
+      type="password"
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className="justify-center px-4 py-2 mt-2 bg-white rounded-lg border border-solid border-neutral-200 text-ellipsis max-md:max-w-full"
@@ -76,6 +91,23 @@ const MyComponent: React.FC = () => {
   const [contractDate, setContractDate] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [regional, setRegional] = React.useState("");
+  const [formUser, setFormUser] = React.useState("");
+  const [formPassword, setFormPassword] = React.useState("");
+
+  const handleChangeCredentials = () => {
+    localStorage.setItem("user", formUser)
+    localStorage.setItem("password", formPassword)
+    toast.success('Se cambiaron las credenciales.', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      });
+  }
 
   const genderOptions: SelectOption[] = [
     { label: "Male", value: "male" },
@@ -90,18 +122,60 @@ const MyComponent: React.FC = () => {
     { label: "West", value: "west" },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({
-      name,
-      identification,
-      email,
-      gender,
-      birthdate,
-      contractDate,
-      phone,
-      regional,
-    });
+
+    const representanteData = {
+      identificacion: parseInt(identification),
+      correo: email,
+      nombre1: name,
+      nombre2: '', // Opcional
+      apellido1: 'a',
+      apellido2: '', // Opcional
+      genero: gender.charAt(0),
+      fechaNacimiento: new Date(birthdate).toISOString(), // Convertir la fecha de nacimiento a formato ISO 8601
+      fechaContratacion: new Date(contractDate).toISOString(), // Convertir la fecha de contrato a formato ISO 8601
+      telefono: parseInt(phone),
+      diraccion: 'a',
+      codigoRegion: 1, //TODO: hacerlo dinamico
+    };
+
+    console.log(representanteData);
+    
+  
+    try {
+      const response = await axios.post('http://localhost:8080/representante/agregar', representanteData, {
+        headers: {
+          user: localStorage.getItem("user"),
+          password: localStorage.getItem("password"),
+        },
+      });
+      console.log('Representante registrado con éxito:', response.data);
+      toast.success('Representante registrado con éxito', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
+
+    } catch (error: any) {
+      console.error('Error al registrar representante:', error.response.data);
+      toast.error(`Error al registrar representante: ${error.response.data}`, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
+    }
+
   };
 
   return (
@@ -128,6 +202,14 @@ const MyComponent: React.FC = () => {
                 <div className="flex-1 text-ellipsis">Cliente</div>
               </button>
             </div>
+            <Input label="Usuario" value={formUser} onChange={(value) => setFormUser(value)} />
+            <PasswordInput label="Contraseña" value={formPassword} onChange={(value) => setFormPassword(value)} />
+            <button
+                onClick={handleChangeCredentials}
+                className="justify-center self-start px-4 py-2 mt-8 font-medium text-white whitespace-nowrap bg-lime-800 rounded-lg"
+              >
+                Cambiar credenciales
+            </button>
           </div>
         </nav>
         <main className="flex flex-col ml-5 w-[66%] max-md:ml-0 max-md:w-full">
@@ -163,6 +245,7 @@ const MyComponent: React.FC = () => {
             </form>
           </section>
         </main>
+        <ToastContainer />
       </div>
     </div>
   );

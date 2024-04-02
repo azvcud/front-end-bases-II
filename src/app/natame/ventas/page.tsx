@@ -110,9 +110,9 @@ const MyComponent: React.FC = () => {
   }
 
   const genderOptions: SelectOption[] = [
-    { label: "Male", value: "male" },
-    { label: "Female", value: "female" },
-    { label: "Other", value: "other" },
+    { label: "Masculino", value: "M" },
+    { label: "Femenino", value: "F" },
+    { label: "Otro", value: "O" },
   ];
 
   const regionalOptions: SelectOption[] = [

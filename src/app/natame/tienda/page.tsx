@@ -16,10 +16,9 @@ interface ProductCardProps {
 
 interface APIProduct {
   nombre: string;
-  codigo: number;
-  subCategoria: number;
-  categoria: number;
-  precioUnitario: number;
+  precio: number;
+  disponible: number;
+  codRegion: number;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -32,12 +31,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className="flex flex-col self-start mt-7 ml-6 max-md:ml-2.5">
         <div className="text-black">{product.name}</div>
         <div className="mt-2 text-lime-800">$ {product.price}</div>
-        <div className="mt-7 text-base leading-6 text-neutral-500">
-          {product.category}
-        </div>
-        <div className="mt-1 text-base leading-6 text-neutral-500">
-          {product.subcategory}
-        </div>
         <button
           className="mt-4 px-4 py-2 bg-lime-800 text-white rounded"
           onClick={onAddToCart}
@@ -82,12 +75,11 @@ const MyComponent: React.FC = () => {
           },
         });
 
-        setProducts(response.data.map((item: APIProduct) => ({
-          id: item.codigo,
+        setProducts(response.data.map((item: APIProduct, index: number) => ({
+          id: index,
           name: item.nombre,
-          price: item.precioUnitario.toFixed(2),
-          category: item.categoria,
-          subcategory: item.subCategoria,
+          price: item.precio.toFixed(2),
+          stock: item.disponible,
           image: '',
           quantity: 0,
         })));

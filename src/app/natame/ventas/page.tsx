@@ -84,12 +84,14 @@ const Select: React.FC<SelectProps> = ({ label, options, onChange }) => (
 
 const MyComponent: React.FC = () => {
   const [name, setName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
   const [identification, setIdentification] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [gender, setGender] = React.useState("");
   const [birthdate, setBirthdate] = React.useState("");
   const [contractDate, setContractDate] = React.useState("");
   const [phone, setPhone] = React.useState("");
+  const [address, setAddress] = React.useState("");
   const [regional, setRegional] = React.useState("");
   const [formUser, setFormUser] = React.useState("");
   const [formPassword, setFormPassword] = React.useState("");
@@ -125,18 +127,32 @@ const MyComponent: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!identification || !email || !name || !lastName || !gender || !birthdate || !contractDate || !phone || !address) {
+      toast.warn('Por favor completa todos los campos obligatorios.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
+      return;
+    }
+
     const representanteData = {
       identificacion: parseInt(identification),
       correo: email,
       nombre1: name,
       nombre2: '', // Opcional
-      apellido1: 'a',
+      apellido1: lastName,
       apellido2: '', // Opcional
       genero: gender.charAt(0),
       fechaNacimiento: new Date(birthdate).toISOString(), // Convertir la fecha de nacimiento a formato ISO 8601
       fechaContratacion: new Date(contractDate).toISOString(), // Convertir la fecha de contrato a formato ISO 8601
       telefono: parseInt(phone),
-      diraccion: 'a',
+      diraccion: address,
       codigoRegion: 1, //TODO: hacerlo dinamico
     };
 
@@ -229,12 +245,14 @@ const MyComponent: React.FC = () => {
                 <div className="justify-center my-auto text-ellipsis">Tomate Virgilio</div>
               </div>
               <Input label="Nombre" value={name} onChange={(value) => setName(value)} />
+              <Input label="Apellido" value={lastName} onChange={(value) => setLastName(value)} />
               <Input label="Identificación" value={identification} onChange={(value) => setIdentification(value)} />
               <Input label="Correo Electrónico" value={email} onChange={(value) => setEmail(value)} />
               <Select label="Género" options={genderOptions} onChange={(value) => setGender(value)} />
               <DateInput label="Fecha de nacimiento" value={birthdate} onChange={(value) => setBirthdate(value)} />
               <DateInput label="Fecha de contrato" value={contractDate} onChange={(value) => setContractDate(value)} />
               <Input label="Teléfono de contacto" value={phone} onChange={(value) => setPhone(value)} />
+              <Input label="Dirección" value={address} onChange={(value) => setAddress(value)} />
               <Select label="Regional" options={regionalOptions} onChange={(value) => setRegional(value)} />
               <button
                 type="submit"

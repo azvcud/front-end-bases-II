@@ -31,6 +31,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className="flex flex-col self-start mt-7 ml-6 max-md:ml-2.5">
         <div className="text-black">{product.name}</div>
         <div className="mt-2 text-lime-800">$ {product.price}</div>
+        <div className="mt-7 text-base leading-6 text-neutral-500">
+          Unidades disponibles: {product.stock}
+        </div>
         <button
           className="mt-4 px-4 py-2 bg-lime-800 text-white rounded"
           onClick={onAddToCart}
